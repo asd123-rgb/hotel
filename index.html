@@ -1,0 +1,594 @@
+<!doctype html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Hotel</title>
+    <link rel="stylesheet" href="assets/css/bootstrap.min.css">
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+</head>
+
+<body style="
+            background-size: cover;
+            height: 100vh;
+            ">
+
+    <div id="app">
+        <div class="main-app-container" :style="'background-image:' + photo"
+            style="background-size: cover; height: 100vh;">
+            <header class="text-white">
+                <div class="mask h-100"
+                    style="background-image: linear-gradient(to bottom,rgba(0,0,0,0.7),rgba(255,255,255,0));">
+                    <div class="container d-flex justify-content-between py-2">
+                        <a href="#" class="navbar-brand text-white" @click="openPage('index')">
+                            <strong>HOTEL</strong>
+                        </a>
+                        <nav class="nav nav-pills">
+                            <a href="#" class="nav-link text-white" @click="openPage('index')">Главная</a>
+                            <a href="#" class="nav-link text-white" @click="openPage('login')">Вход</a>
+                            <a href="#" class="nav-link text-white" @click="openPage('login')">Выход</a>
+                        </nav>
+                        <form class="my-2">
+                            <div class="input-group">
+                                <input class="form-control" type="search" placeholder="Поиск заявки по коду"
+                                    aria-label="Search">
+                                <div class="input-group-append">
+                                    <a href="booking.html" class="btn btn-outline-light" type="submit">Найти</a>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Главная -->
+            <div class="container d-flex justify-content-center " v-if="page=='index'">
+                <form class="bg-dark rounded-3 p-5 position-absolute top-50 start-50 translate-middle"
+                    style="--bs-bg-opacity: .7;">
+                    <h3 class="text-white">Бронирование номера</h3>
+                    <div class="row">
+                        <div class="col-4">
+                            <!-- Заезд -->
+                            <div class="form-outline mb-4">
+                                <label class="form-label text-white-50">Дата заезда*</label>
+                                <input type="date" class="form-control" v-model="addBooking.in" >
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <!-- Выезд -->
+                            <div class="form-outline mb-4">
+                                <label class="form-label text-white-50">Дата выезда*</label>
+                                <input type="date" class="form-control" v-model="addBooking.out" />
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="form-outline mb-4">
+                                <label class="form-label text-white-50">Количество гостей*</label>
+                                <select class="form-select" aria-label="Default select example"
+                                    v-model="addBooking.amount_guests">
+                                    <option selected disabled value="">Количество</option>
+                                    <option value="1">1</option>
+                                    <option value="2">2</option>
+                                    <option value="3">3</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-end">
+                        <a href="#" type="submit" class="btn btn-success btn-block "
+                            @click="openPage('addBooking')">Бронировать</a>
+                    </div>
+                </form>
+            </div>
+            <!-- Главная end -->
+
+            <!-- Бронирование -->
+            <div class="container w-75 border bg-light mt-5" v-if="page=='addBooking'">
+                <section class="p-5">
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <h2>Заявка на бронирование номера</h2>
+                    </div>
+                    <form>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <!-- Заезд -->
+                                <div class="form-outline mb-2">
+                                    <label class="form-label">Дата заезда*</label>
+                                    <input type="date" class="form-control" v-model="addBooking.in">
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <!-- Заезд -->
+                                <div class="form-outline mb-2">
+                                    <label class="form-label">Дата отъезда*</label>
+                                    <input type="date" class="form-control" v-model="addBooking.out">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <div class="row">
+                                <div class="col-3" v-for="category in categories.data" v-show="category.guests>=addBooking.amount_guests">
+                                    <div class="card mb-1" >
+                                        <img class="card-img-top" :src="category.photo" alt="placeholder">
+                                        <div class="card-img-overlay">
+                                            <div class="d-flex justify-content-between">
+                                                <span class="badge bg-info mb-3">10000 руб</span>
+                                                <input type="radio" class="btn-check" name="category"
+                                                    :id="'category'+category.id" autocomplete="off" v-model="addBooking.room_category_id" :value="category.id">
+                                                <label class="btn btn-outline-warning"
+                                                    :for="'category'+category.id">Выбрать</label>
+                                            </div>
+                                        </div>
+                                        <div class="card-body">
+                                            <p class="card-text">
+                                                <small class="text-muted">{{category.code}}</small>
+                                            </p>
+                                            <h5 class="card-title">{{category.name}}</h5>
+                                            <div class="d-flex flex-row mb-2">
+                                                <div class="m-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                                                        fill="currentColor"
+                                                        class="bi bi-arrows-angle-expand text-primary"
+                                                        viewBox="0 0 16 16">
+                                                        <path fill-rule="evenodd"
+                                                            d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z">
+                                                        </path>
+                                                    </svg>
+                                                    <small> {{category.square}} кв.м </small>
+                                                </div>
+                                                <div class="m-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                                                        fill="currentColor" class="bi bi-layout-split text-primary"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8.5zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5V2z" />
+                                                    </svg>
+                                                    <small> {{category.number_of_rooms}} комн. </small>
+                                                </div>
+                                                <div class="m-1">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15"
+                                                        fill="currentColor" class="bi bi-people text-primary"
+                                                        viewBox="0 0 16 16">
+                                                        <path
+                                                            d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1  1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
+                                                    </svg>
+                                                    <small> до {{category.guests}} мест. </small>
+                                                </div>
+                                            </div>
+                                            <div>Cвободных номеров: {{category.number_of_apartments}}</div>
+                                            <a href="#" class="btn btn-link mt-3" @click="oneCategory(category.id)"
+                                                style="position: relative;">Подробнее</a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row mb-4">
+                            <div class="col-12">
+                                <div class="card" v-for="(guest, i) in addBooking.guests.slice(0, parseInt(addBooking.amount_guests))">
+                                    <div
+                                        class="card-header d-flex justify-content-between bg-secondary bg-opacity-75 text-white">
+                                        <h5 class="card-title">
+                                            Данные гостя №{{i+1}}
+                                        </h5>
+                                        <button type="button" class="btn-close btn-close-white" aria-label="Close" @click="deleteGuest(i)"
+                                            :disabled="addBooking.amount_guests <= 1"></button>
+                                    </div>
+                                    <div class="card-body">
+                                        <div class="row">
+                                            <div class="form-outline mb-4 col-4">
+                                                <label class="form-label">Фамилия</label>
+                                                <input type="text" class="form-control"
+                                                    v-model="addBooking.guests[i].surname">
+                                            </div>
+                                            <div class="form-outline mb-4 col-4">
+                                                <label class="form-label">Имя*</label>
+                                                <input type="text" class="form-control"
+                                                    v-model="addBooking.guests[i].name">
+                                            </div>
+                                            <div class="form-outline mb-4 col-4">
+                                                <label class="form-label">Отчество</label>
+                                                <input type="text" class="form-control"
+                                                    v-model="addBooking.guests[i].patronymic">
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-6 mb-3">
+                                                <div class="form-outline mb-2">
+                                                    <label class="form-label">Дата рождения*</label>
+                                                    <input type="date" class="form-control"
+                                                        v-model="addBooking.guests[i].birthday">
+                                                </div>
+                                            </div>
+                                            <div class="col-6 mb-3">
+                                                <label class="form-label">Пол*</label>
+                                                <div class="d-flex flex-row border p-1">
+                                                    <div class="form-check mx-2">
+                                                        <input class="form-check-input" type="radio"
+                                                            :name="'exampleRadios'+i" id="" value="м"
+                                                            v-model="addBooking.guests[i].gender">
+                                                        <label class="form-check-label" for="exampleRadios1">
+                                                            мужской
+                                                        </label>
+                                                    </div>
+                                                    <div class="form-check mx-2">
+                                                        <input class="form-check-input" type="radio"
+                                                            :name="'exampleRadios'+i" id="" value="ж"
+                                                            v-model="addBooking.guests[i].gender">
+                                                        <label class="form-check-label" for="exampleRadios2">
+                                                            женский
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                        </div>
+                                        <div class="row">
+                                            <label class="form-label">Документ, удостоверяющий личность*</label>
+                                            <div class="input-group mb-3">
+                                                <select class="form-select" aria-label="Default select example"
+                                                    v-model="addBooking.guests[i].document_type_id">
+                                                    <option selected disabled value="">Выбор типа документа</option>
+                                                    <option value="1">Паспорт гражданина РФ</option>
+                                                    <option value="2">Свидетельство о рождении</option>
+                                                    <option value="3">Паспорт иностранного гражданина</option>
+                                                </select>
+                                                <input type="text" class="form-control" placeholder="Номер документа"
+                                                    v-model="addBooking.guests[i].document_number">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button type="button" :disabled="addBooking.amount_guests >= 3" class="btn btn-outline-primary small" @click="addGuest()">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                    class="bi bi-person-plus-fill" viewBox="0 0 16 16">
+                                    <path
+                                        d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6z" />
+                                    <path fill-rule="evenodd"
+                                        d="M13.5 5a.5.5 0 0 1 .5.5V7h1.5a.5.5 0 0 1 0 1H14v1.5a.5.5 0 0 1-1 0V8h-1.5a.5.5 0 0 1 0-1H13V5.5a.5.5 0 0 1 .5-.5z" />
+                                </svg>
+                                Добавить гостя
+                            </button>
+                        </div>
+                        <div class="row mt-5">
+                            <div class="col-6 mb-3">
+                                <div class="form-outline mb-2">
+                                    <label class="form-label">Email</label>
+                                    <input type="email" class="form-control" v-model="addBooking.email">
+                                </div>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <div class="form-outline mb-2">
+                                    <label class="form-label">Телефон</label>
+                                    <input type="text" class="form-control" v-model="addBooking.phone">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-outline mb-4">
+                            <label class="form-label">Город</label>
+                            <input type="text" class="form-control" v-model="addBooking.city">
+                        </div>
+                        <a @click.prevent="booking('booking')" class="btn btn-success mt-4">Бронировать</a>
+                    </form>
+                </section>
+            </div>
+            <!-- Бронирование end -->
+
+            <!-- Логин -->
+            <div class="container" v-if="page=='login'">
+                <div class="d-flex justify-content-center mt-5">
+                    <section class="p-5 border bg-light col-3">
+                        <div class="mb-4 d-flex justify-content-between align-items-center">
+                            <h2>Вход</h2>
+                        </div>
+
+                        <form class="rounded-3">
+                            <div class="mb-3">
+                                <label>Логин</label>
+                                <input type="text" class="form-control" placeholder="Логин">
+                            </div>
+                            <div class="mb-3">
+                                <label>Пароль</label>
+                                <input type="password" class="form-control" placeholder="Пароль">
+                            </div>
+                            <a href="manage.html" class="btn btn-success">Войти</a>
+                        </form>
+                    </section>
+                </div>
+            </div>
+            <!-- Логин end -->
+
+            <!-- Добавление менеджера -->
+            <section class=" container p-5 border bg-light col-4 mt-4" v-if="page=='addManager'">
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <h2>Добавление менеджера</h2>
+                </div>
+                <form class="rounded-3">
+                    <div class="mb-3">
+                        <label>Фамилия</label>
+                        <input type="text" class="form-control" placeholder="Фамилия">
+                    </div>
+                    <div class="mb-3">
+                        <label>Имя*</label>
+                        <input type="text" class="form-control" placeholder="Имя">
+                    </div>
+                    <div class="mb-3">
+                        <label>Отчество</label>
+                        <input type="text" class="form-control" placeholder="Отчество">
+                    </div>
+                    <div class="mb-3">
+                        <label>Логин*</label>
+                        <input type="text" class="form-control" placeholder="Логин">
+                    </div>
+                    <div class="mb-3">
+                        <label>Пароль</label>
+                        <input type="password" class="form-control" placeholder="Пароль">
+                    </div>
+                    <div class="mb-3">
+                        <label>Фото*</label>
+                        <input type="file" class="form-control">
+                    </div>
+                    <a href="manage.html" class="btn btn-success mt-3">Добавить</a>
+                </form>
+            </section>
+            <!-- Добавление менеджера end -->
+
+            <!-- Добавление прайса -->
+            <section class=" container p-5 border bg-light col-4 mt-4" v-if="page=='addPrice'">
+                <div class="mb-4 d-flex justify-content-between align-items-center">
+                    <h2>Добавление прайса</h2>
+                </div>
+                <form class="rounded-3">
+                    <div class="mb-3">
+                        <label>Категория номера</label>
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected disabled value="">Выбор категории номера</option>
+                            <option value="1">One</option>
+                            <option value="2">Two</option>
+                            <option value="3">Three</option>
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label>Сумма</label>
+                        <input type="text" class="form-control" placeholder="Введите сумму">
+                    </div>
+                    <div class="mb-3">
+                        <label>Дата начала действия</label>
+                        <input type="date" class="form-control">
+                    </div>
+                    <a href="manage.html" class="btn btn-success mt-3">Добавить</a>
+                </form>
+            </section>
+            <!-- Добавление прайса end -->
+
+            <!-- Подробный вывод заявки -->
+            <div class="container w-50 border bg-light mt-5" v-if="page=='booking'">
+                <section class="p-5">
+                    <div class="d-flex justify-content-between">
+                        <h2>Заявка на бронирование номера</h2>
+                        <div class="badge bg-primary">
+                            <h2>h564kl7</h2>
+                        </div>
+                    </div>
+                    <div class="my-2">
+                        <b>Категория номера:</b> Двухместный
+                    </div>
+                    <div class="my-2">
+                        <b>Email:</b> login@domain.com
+                    </div>
+                    <div class="my-2">
+                        <b>Телефон:</b> 89627451245
+                    </div>
+                    <div class="my-2">
+                        <b>Город:</b> Москва
+                    </div>
+                    <div class="row mt-4">
+                        <div class="col-4">
+                            <div class="card mb-4">
+                                <div
+                                    class="card-header d-flex justify-content-between bg-secondary bg-opacity-75 text-white">
+                                    <h5 class="card-title">
+                                        Гость №1
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div><b>ФИО: </b>Иванов Иван Иванович</div>
+                                    <div><b>Дата рождения: </b>12.06.1990</div>
+                                    <div><b>Пол: </b>м</div>
+                                    <div><b>Тип документа: </b>Паспорт гражданина РФ</div>
+                                    <div><b>Номер документа: </b>123456789</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-4">
+                            <div class="card mb-4">
+                                <div
+                                    class="card-header d-flex justify-content-between bg-secondary bg-opacity-75 text-white">
+                                    <h5 class="card-title">
+                                        Гость №2
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div><b>ФИО: </b>Смирнова Наталья Петровна</div>
+                                    <div><b>Дата рождения: </b>22.02.1991</div>
+                                    <div><b>Пол: </b>ж</div>
+                                    <div><b>Тип документа: </b>Паспорт гражданина РФ</div>
+                                    <div><b>Номер документа: </b>987654321</div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                    <form>
+                        <label class="form-label"><b>Статус заявки: </b></label>
+                        <select class="form-select" aria-label="Default select example">
+                            <option selected disabled value="" aria-disabled="true">Статус заявки</option>
+                            <option value="1">Ожидание</option>
+                            <option value="2">Согласована</option>
+                            <option value="3">Отлонена</option>
+                        </select>
+                        <a href="manage.html" class="btn btn-success mt-4">Сохранить</a>
+                    </form>
+                </section>
+            </div>
+            <!-- Подробный вывод заявки end -->
+
+            <!-- Вывод категорий -->
+            <div class="container" v-if="page=='category'">
+                <section class="py-5">
+                    <div class="row">
+                        <div class="col-5">
+                            <img class="mb-4 w-100" :src="info_category.photo" alt="placeholder">
+                        </div>
+                        <div class="col-7">
+                            <h2 class="mb-2">{{info_category.name}}</h2>
+                            <div class="text-muted">{{info_category.code}}</div>
+                            <hr>
+                            <div class="d-flex flex-row">
+                                <div class="m-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        class="bi bi-arrows-angle-expand text-primary" viewBox="0 0 16 16">
+                                        <path fill-rule="evenodd"
+                                            d="M5.828 10.172a.5.5 0 0 0-.707 0l-4.096 4.096V11.5a.5.5 0 0 0-1 0v3.975a.5.5 0 0 0 .5.5H4.5a.5.5 0 0 0 0-1H1.732l4.096-4.096a.5.5 0 0 0 0-.707zm4.344-4.344a.5.5 0 0 0 .707 0l4.096-4.096V4.5a.5.5 0 1 0 1 0V.525a.5.5 0 0 0-.5-.5H11.5a.5.5 0 0 0 0 1h2.768l-4.096 4.096a.5.5 0 0 0 0 .707z">
+                                        </path>
+                                    </svg>
+                                    {{info_category.square}} кв.м
+                                </div>
+                                <div class="m-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        class="bi bi-layout-split text-primary" viewBox="0 0 16 16">
+                                        <path
+                                            d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm8.5-1v12H14a1 1 0 0 0 1-1V3a1 1 0 0 0-1-1H8.5zm-1 0H2a1 1 0 0 0-1 1v10a1 1 0 0 0 1 1h5.5V2z" />
+                                    </svg>
+                                    {{info_category.number_of_rooms}} комн.
+                                </div>
+                                <div class="m-3">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor"
+                                        class="bi bi-people text-primary" viewBox="0 0 16 16">
+                                        <path
+                                            d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z" />
+                                    </svg>
+                                    до {{info_category.guests}} мест.
+                                </div>
+                            </div>
+                            <hr>
+                            <p class="mt-3">
+                                {{info_category.description}}
+                            </p>
+                            <div class="border bg-light">
+                                <div class="m-3" v-for="service in info_category.service_icons"
+                                    v-html="service.code + service.name">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                </section>
+            </div>
+            <!-- Вывод категорий end -->
+
+            <!-- Управление заявками на бронирование -->
+            <div class="container my-2" v-if="page=='manage'">
+
+                <section class="py-5">
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <h2>Управление заявками на бронирование</h2>
+                        <!--        <button class="btn btn-sm btn-success">Добавить статью</button>-->
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>#</th>
+                            <th>code</th>
+                            <th>Дата и время</th>
+                            <th>Статус</th>
+                            <th>Дата заезда</th>
+                            <th>Дата отъезда</th>
+                            <th>Категория номера</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>h564kl7</td>
+                            <td>09.02.2022 16:00</td>
+                            <td>Ожидание</td>
+                            <td>01.03.2022</td>
+                            <td>12.03.2022</td>
+                            <td>Двухместный номер</td>
+                            <td>
+                                <a href="booking.html" class="btn btn-primary btn-sm">Редактировать</a>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <hr>
+                <section class="py-5">
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <h2>Управление менеджерами</h2>
+                        <a href="addManager.html" class="btn btn-sm btn-success">Добавить менеджера</a>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>#</th>
+                            <th>ФИО</th>
+                            <th>login</th>
+                            <th>Статус</th>
+                            <th>Фото</th>
+                            <th></th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>Иванов Иван Иванович</td>
+                            <td>manager1</td>
+                            <td>working</td>
+                            <td><img src="assets/images/reviews-user-photo.jpg" class="img-thumbnail" width="100px"
+                                    alt="">
+                            </td>
+                            <td>
+                                <a href="#" class="btn btn-danger btn-sm">Уволить</a>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+                <hr>
+                <section class="py-5">
+                    <div class="mb-4 d-flex justify-content-between align-items-center">
+                        <h2>Управление прайсами</h2>
+                        <a href="addPrice.html" class="btn btn-sm btn-success">Добавить прайс</a>
+                    </div>
+                    <table class="table">
+                        <tr>
+                            <th>#</th>
+                            <th>code</th>
+                            <th>Категория номера</th>
+                            <th>Дата начала действия</th>
+                            <th>Цена за номер в день</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>single-01-03-2022</td>
+                            <td>Одноместный</td>
+                            <td>01.03.2022</td>
+                            <td>
+                                <form class="d-flex d-inline-flex">
+                                    <input type="text" class="form-control" value="1000">
+                                    <a href="manage.html" class="btn btn-primary">
+                                        Сохранить
+                                    </a>
+                                </form>
+                            </td>
+                        </tr>
+                    </table>
+                </section>
+            </div>
+            <!-- Управление заявками на бронирование end -->
+        </div>
+    </div>
+    <script src="app.js"></script>
+</body>
+
+</html>

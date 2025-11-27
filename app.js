@@ -93,7 +93,7 @@ const app = Vue.createApp({
                 redirect: "follow"
             };
 
-            fetch("https://server.vippo.ru/api/category", requestOptions)
+            fetch("http://server.vippo.ru/api/category", requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     this.categories = result
@@ -110,7 +110,7 @@ const app = Vue.createApp({
                 redirect: "follow"
             };
 
-            fetch("https://server.vippo.ru/api/category/" + id, requestOptions)
+            fetch("http://server.vippo.ru/api/category/" + id, requestOptions)
                 .then((response) => response.json())
                 .then((result) => {
                     this.info_category = result.data
@@ -141,7 +141,7 @@ const app = Vue.createApp({
                 redirect: "follow"
             };
 
-            fetch("https://server.vippo.ru/api/booking", requestOptions)
+            fetch("http://server.vippo.ru/api/booking", requestOptions)
                 .then((response) => response.text())
                 .then((result) => {
                     this.page = page
